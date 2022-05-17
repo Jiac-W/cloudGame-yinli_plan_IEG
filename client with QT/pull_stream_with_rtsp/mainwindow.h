@@ -41,8 +41,8 @@ private:
     Ui::MainWindow *ui;
     ClientStuff *client;
 
-    VideoPlayer *mPlayer;    //播放线程
-    QImage mImage;           //记录当前的图像
+    VideoPlayer *mPlayer;    // 播放线程
+    QImage mImage;           // 记录当前的图像
     QString url;
 
 };

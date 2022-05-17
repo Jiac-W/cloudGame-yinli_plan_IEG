@@ -117,17 +117,17 @@ void MainWindow::on_pushButton_disconnect_clicked()
 void MainWindow::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
-    painter.setBrush(Qt::white);
-    painter.drawRect(0, 0, 1024, 768); //先画成白色
+    painter.setBrush(Qt::white); 
+    painter.drawRect(0, 0, 1024, 768); // 先画成白色
     if (mImage.size().width() <= 0) return;
     if(client->status)
-        painter.drawImage(QPoint(0,0),mImage); //画出图像
+        painter.drawImage(QPoint(0,0),mImage); // 画出图像
 }
 
 
 void MainWindow::slotGetOneFrame(QImage img)
     mImage = img;
-    update(); //调用update将执行 paintEvent函数
+    update(); // 调用update将执行 paintEvent函数
 }
 
 void MainWindow::on_pushButton_start_clicked()

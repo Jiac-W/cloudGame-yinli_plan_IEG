@@ -1,10 +1,5 @@
-//  修改自qinyi_style   FFMPEG音视频同步-读取摄像头并编码封装保存
-// 	https://blog.csdn.net/quange_style/article/details/90082391
-
 #include "../include/ScreenRecorder.h"
-// #include <pthread.h>
 
-// #define STREAM_DURATION   10.0  //视频预设总时长 
 #define STREAM_FRAME_RATE 25 /* 25 images/s */  
 #define STREAM_PIX_FMT    AV_PIX_FMT_YUV420P /* default pix_fmt */  
 
@@ -12,15 +7,10 @@ using std::cout;
 using std::endl;
 using std::string;
 
-// int pix_width = 1920;
-// int pix_height = 1080;
 int pix_width = 1024;
 int pix_height = 768;
 bool pipe_flag = true;
 int video_frame_count = 0;
-
-// #undef av_err2str
-// #define av_err2str(errnum) av_make_error_string((char*)__builtin_alloca(AV_ERROR_MAX_STRING_SIZE), AV_ERROR_MAX_STRING_SIZE, errnum)
 
 typedef struct OutputStream {  
     AVStream *st;  
@@ -32,10 +22,8 @@ typedef struct OutputStream {
     float t, tincr, tincr2;  
     struct SwsContext *sws_ctx;  
     struct SwrContext *swr_ctx;  
-	
-	// modify
 	AVStream *in_stream;
-} OutputStream;  //相较于标准的结构体少了后面的部分，只有前面的几个参数
+} OutputStream;  
   
 typedef struct IntputDev {  
 	AVCodecContext  *pCodecCtx;  		//pCodecCtx=v_ifmtCtx->streams[videoindex]->codec;  
@@ -47,28 +35,18 @@ typedef struct IntputDev {
 	AVFrame *pFrame,*pFrameYUV;         //av_frame_alloc---->解码得到pFrame→→格式转换→→pFrameYUV	avpicture_fill((AVPicture *)pFrameYUV, out_buffer..) 
 }IntputDev;  
   
-static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt)  //log日志相关 打印一些信息 	Definition at line 70 of file muxing.c.
+static void log_packet(const AVFormatContext *fmt_ctx, const AVPacket *pkt)  // log日志相关 打印一些信息
 {  
     AVRational *time_base = &fmt_ctx->streams[pkt->stream_index]->time_base;  
-  
-	// printf("pts:%s pts_time:%s duration:%s\n",av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, time_base),av_ts2str(pkt->duration));
-	/*
-    printf("pts:%s pts_time:%s dts:%s dts_time:%s duration:%s duration_time:%s stream_index:%d\n",  
-           av_ts2str(pkt->pts), av_ts2timestr(pkt->pts, time_base),  
-           av_ts2str(pkt->dts), av_ts2timestr(pkt->dts, time_base),  
-           av_ts2str(pkt->duration), av_ts2timestr(pkt->duration, time_base),  
-           pkt->stream_index);  //这里pts和dts都源自编码前frame.pts 而duration没有被赋值，是初始化时的0
-	*/
 }  
 
 // pkt写入之前要先处理pkt->pts和pkt->stream_index
-static int write_frame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt)  //Definition at line 81 of file muxing.c.
+static int write_frame(AVFormatContext *fmt_ctx, const AVRational *time_base, AVStream *st, AVPacket *pkt)
 {  
-    /* rescale output packet timestamp values from codec(帧序号) to stream timebase */  
+	// 例如：av_packet_rescale_ts将pkt->pts从帧序号33→时间戳118800
     av_packet_rescale_ts(pkt, *time_base, st->time_base);  
-			//例如：av_packet_rescale_ts将pkt->pts从帧序号33→时间戳118800
     pkt->stream_index = st->index;  
-  
+
     /* Write the compressed frame to the media file. */  
     log_packet(fmt_ctx, pkt);  
     return av_interleaved_write_frame(fmt_ctx, pkt);  
@@ -150,20 +128,19 @@ static void add_stream(OutputStream *ost, AVFormatContext *oc,  AVCodec **codec,
 		break;  
 	}  
   
-	/* Some formats want stream headers to be separate. */  
+	// oc的格式需要分离的文件头→→c的格式也需要分离的文件头
 	if (oc->oformat->flags & AVFMT_GLOBALHEADER)  
-		c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;  //oc的格式需要分离的文件头→→c的格式也需要分离的文件头
+		c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;  
 }  
 
-/**************************************************************************/  
-/* video output */  
-static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height)  //申请一个指定长宽像素的AVFrame
+// video output,申请一个指定长宽像素的AVFrame
+static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height)  
 {  
 	AVFrame *picture;  
 	int ret;  
   
-	picture = av_frame_alloc();  //this only allocates the AVFrame itself, not the data buffers.
-	//Those must be allocated through other means, e.g. with av_frame_get_buffer() or manually.
+	picture = av_frame_alloc();  // this only allocates the AVFrame itself, not the data buffers.
+	// Those must be allocated through other means, e.g. with av_frame_get_buffer() or manually.
 	if (!picture)  
 		return NULL;  
   
@@ -171,8 +148,8 @@ static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height)
 	picture->width  = width;  
 	picture->height = height;  
   
-	/* allocate the buffers for the frame data */  
-	ret = av_frame_get_buffer(picture, 32);  //为音频或视频数据分配新的缓冲区。
+	// 为音频或视频数据分配新的缓冲区。
+	ret = av_frame_get_buffer(picture, 32);  
 	if (ret < 0) {  
 		fprintf(stderr, "Could not allocate frame data.\n");  
 		exit(1);  
@@ -181,7 +158,8 @@ static AVFrame *alloc_picture(enum AVPixelFormat pix_fmt, int width, int height)
 	return picture;  
 }  
 
-// 1.avcodec_open2(c, codec, &opt);    2.allocate and init a re-usable frame 3.prepar ost->tmp_frame 4.avcodec_parameters_from_context
+// 1.avcodec_open2(c, codec, &opt); 2.allocate and init a re-usable frame;
+// 3.prepar ost->tmp_frame; 4.avcodec_parameters_from_context
 static void open_video(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, AVDictionary *opt_arg)  
 {  
 	int ret;  
@@ -212,7 +190,6 @@ static void open_video(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, A
 	if (!ost->frame) {  fprintf(stderr, "Could not allocate video frame\n");  exit(1);  }  
 	//printf("ost->frame alloc success fmt=%d w=%d h=%d\n",c->pix_fmt,c->width, c->height);  
   
-  
 	/* If the output format is not YUV420P, then a temporary YUV420P 
 	 * picture is needed too. It is then converted to the required 
 	 * output format. */  
@@ -234,7 +211,7 @@ static void open_video(AVFormatContext *oc, AVCodec *codec, OutputStream *ost, A
 }  
   
 // encode one video frame and send it to the muxer  return 1 when encoding is finished, 0 otherwise 
-// 1.avcodec_encode_video2 	2.调用write_frame函数
+// 1.avcodec_encode_video2 	2.write_frame
 static int write_video_frame1(AVFormatContext *oc, OutputStream *ost, AVFrame *frame, int64_t start_time)  
 {  
 	int ret;  
@@ -255,7 +232,6 @@ static int write_video_frame1(AVFormatContext *oc, OutputStream *ost, AVFrame *f
         exit(1);  
 	}  
   
-	// printf("---video- pkt.pts=%s     ",av_ts2str(pkt.pts));  //av_ts2str即将包含时间戳的int64_t变成char*buf    起始就是输出帧序号
 	if (pkt.pts == 0) 
 		printf("----st.num=%d st.den=%d codec.num=%d codec.den=%d---------\n",ost->st->time_base.num,ost->st->time_base.den,  c->time_base.num,c->time_base.den);  
 	// 输出流的AVRational 和 编码器的AVRational
@@ -281,7 +257,6 @@ static int write_video_frame1(AVFormatContext *oc, OutputStream *ost, AVFrame *f
 	}  
   
 	if (ret < 0) {  
-        // fprintf(stderr, "Error while writing video frame: %s\n", av_err2str(ret));  
 		cout<< "Error while writing video frame.\n" <<endl;		
         exit(1);  
 	}  
@@ -289,8 +264,8 @@ static int write_video_frame1(AVFormatContext *oc, OutputStream *ost, AVFrame *f
 	return (frame || got_packet) ? 0 : 1;  
 }  
 
-//1.av_frame_make_writable		2.av_read_frame--avcodec_decode_video2---sws_scale
-//数据流：input->in_packet----input->pFrame----ost->frame
+// 1.av_frame_make_writable		2.av_read_frame--avcodec_decode_video2---sws_scale
+// input->in_packet----input->pFrame----ost->frame
 static AVFrame *get_video_frame1(OutputStream *ost,IntputDev* input,int *got_pic)
 {  
 	int ret, got_picture;  
@@ -571,7 +546,7 @@ int main(int argc, char **argv)
 	int got_pic = 0;  
 
     pthread_t id;
-    pthread_create( &id, NULL, another, &pipe_flag);  //开子线程
+    pthread_create( &id, NULL, another, &pipe_flag);  // 开子线程
 
 	// for time cal
 	timeWatch time_cal;
@@ -591,7 +566,7 @@ int main(int argc, char **argv)
 			if(!got_pic)  
 			{  
 				cout<< "!got_pic.\n";
-				usleep(10000);  //单位是微秒（百万分之一秒）。
+				usleep(10000);  // 单位是微秒（百万分之一秒）。
 				continue;
 			}  
 			encode_video = !write_video_frame1(oc, &video_st, frame, start_time);

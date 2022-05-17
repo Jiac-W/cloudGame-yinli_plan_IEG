@@ -9,21 +9,15 @@
 #include <math.h>
 #include <string.h>
 #include <cassert>
-
 #include <unistd.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <wait.h>
 #include <time.h>
 
-// C program to implement one side of FIFO
-// This side reads first
-// #include <stdio.h>
-// #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-// #include <unistd.h>
 
 #define __STDC_CONSTANT_MACROS
 

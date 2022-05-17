@@ -1,7 +1,3 @@
-/**
- * 参考博客：http://blog.csdn.net/weixin_38215395
- */
-
 #ifndef VIDEOPLAYER_H
 #define VIDEOPLAYER_H
 
@@ -15,7 +11,6 @@
 #include <QDebug>
 #include <QPainter>
 
-//2017.8.10---lizhen
 class VlcInstance;
 class VlcMedia;
 class VlcMediaPlayer;
@@ -31,7 +26,7 @@ public:
     void startPlay();
 
 signals:
-    void sig_GetOneFrame(QImage); //每获取到一帧图像 就发送此信号
+    void sig_GetOneFrame(QImage); // 每获取到一帧图像 就发送此信号
 
 protected:
     void run();

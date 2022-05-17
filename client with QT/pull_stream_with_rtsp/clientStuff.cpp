@@ -30,7 +30,7 @@ void ClientStuff::connect2host()
 
 void ClientStuff::connectionTimeout()
 {
-    //qDebug() << tcpSocket->state();
+    // qDebug() << tcpSocket->state();
     if(tcpSocket->state() == QAbstractSocket::ConnectingState)
     {
         tcpSocket->abort();
@@ -48,44 +48,14 @@ bool ClientStuff::getStatus() {return status;}
 
 void ClientStuff::readyRead()
 {
-//    QDataStream in(tcpSocket);
-//    //in.setVersion(QDataStream::Qt_5_10);
-//    for (;;)
-//    {
-//        if (!m_nNextBlockSize)
-//        {
-//            if (tcpSocket->bytesAvailable() < sizeof(quint16)) { break; }
-//            in >> m_nNextBlockSize;
-//        }
-
-//        if (tcpSocket->bytesAvailable() < m_nNextBlockSize) { break; }
-
-//        QString str;
-//        in >> str;
-
-//        if (str == "0")
-//        {
-//            str = "Connection closed";
-//            closeConnection();
-//        }
-
-        QString str = tcpSocket->readAll();
-        emit hasReadSome(str);
-//        m_nNextBlockSize = 0;
-//    }
+    QString str = tcpSocket->readAll();
+    emit hasReadSome(str);
 }
-
-//void ClientStuff::gotDisconnection()
-//{
-//    status = false;
-//    emit statusChanged(status);
-//}
 
 void ClientStuff::closeConnection()
 {
     timeoutTimer->stop();
 
-    //qDebug() << tcpSocket->state();
     disconnect(tcpSocket, &QTcpSocket::connected, 0, 0);
     disconnect(tcpSocket, &QTcpSocket::readyRead, 0, 0);
 
