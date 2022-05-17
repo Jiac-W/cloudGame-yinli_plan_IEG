@@ -1,0 +1,5 @@
+/home/wu/tencent/video_capture/src/capture_codec/CMakeFiles/rebuild_cache.dir
+/home/wu/tencent/video_capture/src/capture_codec/CMakeFiles/flv.dir
+/home/wu/tencent/video_capture/src/capture_codec/CMakeFiles/ScreenRecorder.dir
+/home/wu/tencent/video_capture/src/capture_codec/CMakeFiles/main.dir
+/home/wu/tencent/video_capture/src/capture_codec/CMakeFiles/edit_cache.dir
