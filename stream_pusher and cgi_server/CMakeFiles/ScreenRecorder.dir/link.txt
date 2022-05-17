@@ -1,2 +1,0 @@
-/usr/bin/ar qc libScreenRecorder.a CMakeFiles/ScreenRecorder.dir/src/ScreenRecorder.cpp.o
-/usr/bin/ranlib libScreenRecorder.a
