@@ -78,7 +78,11 @@
 
 ![4-延时-40ms-](photos/4-延时-40ms-.png)
 
-<video src="photos/Final.mp4"></video>
+
+
+<video width="1920" height="700" controls>
+    <source src="photos/Final.mp4" type="video/mp4">
+</video>
 
 ------
 
