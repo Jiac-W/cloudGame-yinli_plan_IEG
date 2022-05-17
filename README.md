@@ -10,7 +10,7 @@
 
 ![云游戏基本原理示意图](photos/云游戏基本原理示意图.jpg)
 
-<img src="photos/0-Overview.png" style="zoom: 15%;" />
+<img src="photos/0-Overview.png" style="zoom: 100%;" />
 
 
 
