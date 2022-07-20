@@ -37,4 +37,6 @@ int main()
 	cout << "This is test for rebase." << endl;
 
 	cout << "Today is 7/20." << endl;
+
+	cout << "This for last one." << endl;
 }
