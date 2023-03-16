@@ -411,8 +411,11 @@ int main(int argc, char **argv)
 	av_dict_set(&options, "framerate", "30", AV_DICT_MATCH_CASE);
 	// av_dict_set(&options, "draw_mouse", "1", AV_DICT_MATCH_CASE);
 	
-	
-	AVInputFormat *ifmt = av_find_input_format("x11grab");  //screen
+	//*********for USB camera*********//
+	char *deviceName = "/dev/video0";
+
+	// AVInputFormat *ifmt = av_find_input_format("x11grab");  // capture screen
+	AVInputFormat *ifmt = av_find_input_format("video4linux2");  // capture screen
 
 	if (ifmt == NULL)
     {
@@ -420,8 +423,9 @@ int main(int argc, char **argv)
 		exit(1);
     }
 
-	if(avformat_open_input(&v_ifmtCtx,":0.0+0,0",ifmt,&options) != 0){
-		printf("Couldn't open input stream./dev/video1\n");
+	// if(avformat_open_input(&v_ifmtCtx,":0.0+0,0",ifmt,&options) != 0){ // capture screen
+	if(avformat_open_input(&v_ifmtCtx,deviceName,ifmt,&options) != 0){ // capture USB camera
+ 		printf("Couldn't open input stream./dev/video1\n");
 		return -1;
 	}  
     av_dump_format(v_ifmtCtx, 0, ":0.0+0,0", 0);
