@@ -1,0 +1,1 @@
+ffmpeg -f video4linux2 -i "/dev/video0" -vcodec libx264 -f rtsp -rtsp_transport tcp rtsp://127.0.0.1:8554/wjc
